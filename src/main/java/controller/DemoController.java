@@ -18,5 +18,4 @@ public class DemoController {
         demo.setNumber(demo.getNumber() + 1);
         return demo;
     }
-
 }
