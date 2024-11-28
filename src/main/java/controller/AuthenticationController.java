@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder; // Импорт PasswordEncoder
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ public class AuthenticationController {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder; // Добавление PasswordEncoder
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
@@ -47,6 +49,27 @@ public class AuthenticationController {
         } catch (AuthenticationException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid email or password");
+        }
+    }
+
+    @PostMapping("/registration")
+    public ResponseEntity<?> register(@RequestBody AuthenticationRequest request) {
+        try {
+            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+                return ResponseEntity.badRequest().body("Email already exists");
+            }
+
+            ApplicationUser newUser = new ApplicationUser();
+            newUser.setEmail(request.getEmail());
+            newUser.setPassword(passwordEncoder.encode(request.getPassword())); // Использование PasswordEncoder
+
+            userRepository.save(newUser);
+
+            return ResponseEntity.ok("User registered successfully");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error during registration: " + e.getMessage());
         }
     }
 }

@@ -1,5 +1,5 @@
 server:
-  port:
+port: 8080
 spring:
   application:
     name: demo
@@ -9,9 +9,9 @@ spring:
     password: ${JDBC_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
 jwt:
-  secret:
-  expiration:
+  secret: zavyalovegorsergeevich1BIB22066
+  expiration: 3600000
