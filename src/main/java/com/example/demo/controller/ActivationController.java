@@ -39,11 +39,9 @@ public class ActivationController {
     private UserRepository userRepository; // Внедрите UserRepository
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> activateLicense(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> activateLicense(@RequestBody Map<String, String> request) {
         String activationCode = request.get("activationCode");
-        // Получите информацию об устройстве из запроса
         Device device = getDeviceFromRequest(request);
-        // Получите информацию о пользователе из запроса
         ApplicationUser user = getUserFromRequest(request);
 
         Optional<License> optionalLicense = licenseService.findLicenseByCode(activationCode);
@@ -51,22 +49,22 @@ public class ActivationController {
         if (optionalLicense.isPresent()) {
             License license = optionalLicense.get();
 
-          if (licenseService.validateActivation(license, device, user)) {
+            if (licenseService.validateActivation(license, device, user)) {
                 deviceService.createDeviceLicense(license, device);
                 licenseService.updateLicense(license);
                 licenseHistoryService.recordLicenseChange(license, user, "Activated", "success");
 
                 Ticket ticket = licenseService.generateTicket(license, device);
 
-                Map<String, String> response = new HashMap<>();
+                Map<String, Object> response = new HashMap<>();
                 response.put("status", "success");
-                response.put("ticket", String.valueOf(ticket));
+                response.put("ticket", ticket);
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.badRequest().body(Map.of("status", "error", "message", "Активация невозможна"));
             }
         } else {
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "error", "message", "Лицензия не найдена"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "error", "message", "Лицензия не найдена"));
         }
     }
 
