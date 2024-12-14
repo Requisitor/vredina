@@ -44,6 +44,8 @@ public class License {
     private Integer deviceCount;
     private Long duration;
     private String description;
+    // <-- Добавлено
+    @Setter
     private String activationCode;
 
     @OneToMany(mappedBy = "license")
@@ -62,10 +64,6 @@ public class License {
     }
 
     public void setParameters(Map<String, Object> parameters) {
-    }
-
-    public void setActivationCode(String activationCode) {
-        this.activationCode = activationCode; // <-- Добавлено
     }
 
     public void setCreationDate(Date date) {

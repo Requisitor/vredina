@@ -84,7 +84,7 @@ public class LicenseServiceImpl {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
-        ApplicationUser currentUser = userRepository.findByLogin(currentUsername)
+        ApplicationUser currentUser = userRepository.findByEmail(currentUsername)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         License license = new License();
@@ -101,7 +101,7 @@ public class LicenseServiceImpl {
         license.setDuration((long) (parameters.containsKey("duration") ?
                 Integer.parseInt(parameters.get("duration").toString()) : 365));
         license.setDescription(parameters.containsKey("description") ?
-                parameters.get("description").toString() : "Standard license");
+                parameters.get("description").toString() : "Standart License");
         license.setDeviceLicenses(new ArrayList<>());
         license.setDevice(parameters.containsKey("device") ?
                 Boolean.parseBoolean(parameters.get("device").toString()) : false);
@@ -178,13 +178,14 @@ public class LicenseServiceImpl {
         }
     }
 
+
     private ApplicationUser getUserById(Long userId) {
         Optional<ApplicationUser> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
+        return user.orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Пользователь с ID " + userId + " не найден"
+        ));
+
     }
 
     private LicenseType getLicenseTypeById(Long licenseTypeId) {

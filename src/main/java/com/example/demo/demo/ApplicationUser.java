@@ -36,22 +36,6 @@ public class ApplicationUser {
         this.password = password;
         this.role = role;
     }
+
 }
 
-
-    /*public boolean isActive() {
-        return false;
-    }
-
-    public boolean isPresent() {
-        return false;
-    }
-
-    public Optional<ResponseEntity<Object>> map(Object o) {
-        return null;
-    }
-
-    public ApplicationUser orElseThrow(Object userNotFound) {
-        return null;
-    }
-}*/

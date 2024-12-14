@@ -45,7 +45,7 @@ public class LicenseTypeServiceImpl {
     }
 
     public LicenseType getLicenseTypeById(Long licenseTypeId) {
-        return entityManager.find(LicenseType.class, licenseTypeId); // Now correctly retrieves the entity
+        return entityManager.find(LicenseType.class, licenseTypeId);
     }
 
 

@@ -46,7 +46,4 @@ public class ProductServiceImpl {
         return productRepository.findByIsBlocked(isBlocked);
     }
 
-    public Product getProductById(Long productId) {
-        return null;
     }
-}
