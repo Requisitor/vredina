@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.demo.ApplicationUser;
 import com.example.demo.demo.Device;
+import com.example.demo.demo.DeviceDto;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.impl.DeviceServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +16,33 @@ import java.util.List;
 public class DeviceController {
 
     private final DeviceServiceImpl deviceService;
+    private final UserRepository userRepository;
 
-    public DeviceController(DeviceServiceImpl deviceService) {
+    public DeviceController(DeviceServiceImpl deviceService, UserRepository userRepository) {
         this.deviceService = deviceService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
-    public ResponseEntity<Device> createDevice(@RequestBody Device device) {
+    public ResponseEntity<Device> createDevice(@RequestBody DeviceDto deviceDto) {
         try {
+            // Получаем пользователя из DTO
+            ApplicationUser user = deviceDto.getUser();
+
+            // Проверяем, передан ли пользователь
+            if (user == null) {
+                throw new IllegalArgumentException("User is required");
+            }
+
+            // Сохраняем пользователя (если нужно)
+            user = userRepository.save(user);
+
+            // Создаем устройство и связываем с пользователем
+            Device device = new Device();
+            device.setName(deviceDto.getName());
+            device.setMacAddress(deviceDto.getMacAddress());
+            device.setUser(user);
+
             Device createdDevice = deviceService.saveDevice(device);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdDevice);
         } catch (IllegalArgumentException e) {
