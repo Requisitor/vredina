@@ -15,6 +15,9 @@ import java.util.UUID;
 @Entity
 public class License {
 
+    @ManyToOne
+    private Device device;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
