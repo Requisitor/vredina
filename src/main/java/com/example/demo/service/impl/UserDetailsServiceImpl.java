@@ -22,6 +22,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Optional<ApplicationUser> user = userRepository.findByEmail(email);
         return UserDetailsImpl.fromApplicationUser(user.orElseThrow(() -> new UsernameNotFoundException("User not found")));
     }
+
+    public Optional<ApplicationUser> loadUserById(Long userId) {
+        return userRepository.findById(userId);
+    }
 }
-
-

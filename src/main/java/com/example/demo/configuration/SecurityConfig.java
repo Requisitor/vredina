@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/licenses-types").permitAll()
                         .requestMatchers("licenses").hasRole("ADMIN")
                         .requestMatchers("/api/activation").permitAll()
+                        .requestMatchers("/api/licenses/info").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

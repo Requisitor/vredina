@@ -58,7 +58,4 @@ public class DeviceLicense {
         this.activationDate = activationDate;
     }
 
-    public void setDeviceId(String deviceId) {
-    }
 }
-

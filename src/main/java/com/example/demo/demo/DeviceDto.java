@@ -31,4 +31,3 @@ public class DeviceDto {
         this.user = user;
     }
 }
-

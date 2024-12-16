@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -14,9 +16,6 @@ import java.util.UUID;
 @Getter
 @Entity
 public class License {
-
-    @ManyToOne
-    private Device device;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,12 +57,13 @@ public class License {
     private List<LicenseHistory> licenseHistory;
 
 
+
     public License() {
 
     }
 
     public boolean getDevice() {
-        return false;
+        return true;
     }
 
     public void setParameters(Map<String, Object> parameters) {
@@ -78,8 +78,22 @@ public class License {
     public void setDevice(boolean b) {
     }
 
+
     public String generateCode() {
         this.code = UUID.randomUUID().toString();
         return this.code;
+    }
+
+    public License orElseThrow(Object licenseNotFound) {
+        if (this == null) {
+            if (licenseNotFound instanceof Throwable) {
+                throw (RuntimeException) licenseNotFound;
+            } else if (licenseNotFound instanceof String) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, (String) licenseNotFound);
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "License not found");
+            }
+        }
+        return this;
     }
 }

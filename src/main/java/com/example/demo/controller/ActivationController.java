@@ -11,6 +11,7 @@ import com.example.demo.service.impl.LicenseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +53,8 @@ public class ActivationController {
             if (licenseService.validateActivation(license, device, user)) {
                 deviceService.createDeviceLicense(license, device);
                 licenseService.updateLicense(license);
-                licenseHistoryService.recordLicenseChange(license, user, "Activated", "success");
+                // Изменен вызов метода
+                licenseHistoryService.recordLicenseChange(license, "Activated", "success");
 
                 Ticket ticket = licenseService.generateTicket(license, device);
 
@@ -67,8 +69,6 @@ public class ActivationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "error", "message", "Лицензия не найдена"));
         }
     }
-
-
 
     //Вспомогательный метод для получения информации об устройстве из запроса
     private Device getDeviceFromRequest(Map<String, String> request) {

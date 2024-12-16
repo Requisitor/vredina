@@ -1,27 +1,30 @@
 package com.example.demo.controller;
 
-
-import com.example.demo.demo.ApplicationRole;
 import com.example.demo.demo.ApplicationUser;
 import com.example.demo.demo.License;
 import com.example.demo.demo.LicenseHistory;
+import com.example.demo.service.impl.LicenseServiceImpl;
 import com.example.demo.service.impl.LicenseHistoryServiceImpl;
+import com.example.demo.service.impl.UserDetailsServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/license-histories")
 public class LicenseHistoryController {
 
     private final LicenseHistoryServiceImpl licenseHistoryService;
-    private LicenseHistoryServiceImpl applicationUserService;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final LicenseServiceImpl licenseService;
 
-    public LicenseHistoryController(LicenseHistoryServiceImpl licenseHistoryService) {
+    public LicenseHistoryController(LicenseHistoryServiceImpl licenseHistoryService, UserDetailsServiceImpl userDetailsService, LicenseServiceImpl licenseService) {
         this.licenseHistoryService = licenseHistoryService;
+        this.userDetailsService = userDetailsService;
+        this.licenseService = licenseService;
     }
 
     @PostMapping
@@ -56,23 +59,18 @@ public class LicenseHistoryController {
 
     @GetMapping("/license/{licenseId}")
     public List<LicenseHistory> getHistoryByLicense(@PathVariable Long licenseId) {
-        // Предполагается, что у вас есть сервис для получения License по ID
-        License license = new License(); // Замените на получение реального объекта License
-        license.setId(licenseId);
+        License license = licenseService.getLicenseById(licenseId)
+                .orElseThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "License not found"));
         return licenseHistoryService.getHistoryByLicense(license);
     }
 
-    // Дополнительные методы контроллера (примеры):
-
     @GetMapping("/user/{userId}")
     public List<LicenseHistory> getHistoryByUser(@PathVariable Long userId) {
-        // Аналогично getHistoryByLicense, предполагается наличие сервиса для получения ApplicationUser
-        Optional<LicenseHistory> user = applicationUserService.getById(userId);
-        if (user == null) {
-            return List.of(); // Или обработайте случай, когда пользователь не найден
-        }
+        ApplicationUser user = (ApplicationUser) userDetailsService.loadUserById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return licenseHistoryService.getHistoryByUser(user);
     }
+
     @GetMapping("/status/{status}")
     public List<LicenseHistory> getHistoryByStatus(@PathVariable String status) {
         return licenseHistoryService.getHistoryByStatus(status);

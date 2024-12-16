@@ -10,4 +10,12 @@ public interface LicenseHistoryRepository extends JpaRepository<LicenseHistory, 
     List<LicenseHistory> findByLicenseId(Long licenseId);
 
     void deleteAllByLicense(License license);
+
+
+    List<LicenseHistory> findByLicense(com.example.demo.demo.License license);
+
+    List<LicenseHistory> findByUser(com.example.demo.demo.ApplicationUser user);
+
+    List<LicenseHistory> findByStatus(String status);
+
 }

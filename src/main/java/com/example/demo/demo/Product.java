@@ -19,9 +19,4 @@ public class Product {
     private String name;
 
     private Boolean isBlocked;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "product")
-    private List<License> license;
-
 }

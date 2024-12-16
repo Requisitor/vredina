@@ -22,4 +22,3 @@ public class LicenseDto {
     private String license;
 
 }
-
