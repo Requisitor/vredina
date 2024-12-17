@@ -6,12 +6,12 @@ import com.example.demo.demo.ApplicationUser;
 import com.example.demo.demo.Ticket;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.impl.DeviceServiceImpl;
+import com.example.demo.service.impl.DeviceLicenseServiceImpl;
 import com.example.demo.service.impl.LicenseHistoryServiceImpl;
 import com.example.demo.service.impl.LicenseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,16 +28,22 @@ public class ActivationController {
     private final LicenseServiceImpl licenseService;
     private final DeviceServiceImpl deviceService;
     private final LicenseHistoryServiceImpl licenseHistoryService;
+    private final UserRepository userRepository;
+    private final DeviceLicenseServiceImpl deviceLicenseService;
 
     @Autowired
-    public ActivationController(LicenseServiceImpl licenseService, DeviceServiceImpl deviceService, com.example.demo.service.impl.LicenseHistoryServiceImpl licenseHistoryService) {
+    public ActivationController(LicenseServiceImpl licenseService,
+                                DeviceServiceImpl deviceService,
+                                LicenseHistoryServiceImpl licenseHistoryService,
+                                UserRepository userRepository,
+                                DeviceLicenseServiceImpl deviceLicenseService) {
         this.licenseService = licenseService;
         this.deviceService = deviceService;
         this.licenseHistoryService = licenseHistoryService;
+        this.userRepository = userRepository;
+        this.deviceLicenseService = deviceLicenseService;
     }
 
-    @Autowired
-    private UserRepository userRepository; // Внедрите UserRepository
 
     @PostMapping
     public ResponseEntity<?> activateLicense(@RequestBody Map<String, String> request) {
@@ -51,9 +57,11 @@ public class ActivationController {
             License license = optionalLicense.get();
 
             if (licenseService.validateActivation(license, device, user)) {
-                deviceService.createDeviceLicense(license, device);
+                // Получаем сохраненное устройство
+                Device savedDevice = deviceService.createDeviceLicense(license, device);
+                // Создаем запись в device_license с сохраненным устройством
+                deviceLicenseService.createDeviceLicense(license, savedDevice);
                 licenseService.updateLicense(license);
-                // Изменен вызов метода
                 licenseHistoryService.recordLicenseChange(license, "Activated", "success", user);
 
                 Ticket ticket = licenseService.generateTicket(license, device);
@@ -70,15 +78,12 @@ public class ActivationController {
         }
     }
 
-    //Вспомогательный метод для получения информации об устройстве из запроса
     private Device getDeviceFromRequest(Map<String, String> request) {
         Device device = new Device();
         device.setName(request.get("deviceName"));
         device.setMacAddress(request.get("macAddress"));
-
         return device;
     }
-
 
     private ApplicationUser getUserFromRequest(Map<String, String> request) {
         String login = request.get("login");

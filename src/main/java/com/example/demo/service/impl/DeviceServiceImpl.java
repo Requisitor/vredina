@@ -18,6 +18,11 @@ public class DeviceServiceImpl {
         this.deviceRepository = deviceRepository;
     }
 
+    public Device findDeviceById(Long id) {
+        Optional<Device> optionalDevice = deviceRepository.findById(id);
+        return optionalDevice.orElse(null); // Или бросьте исключение
+    }
+
     @Transactional
     public Device saveDevice(Device device) {
         // Валидация данных (например, проверка на null или пустые значения)
@@ -61,9 +66,10 @@ public class DeviceServiceImpl {
     }
 
     @Transactional
-    public void createDeviceLicense(License license, Device device) {
+    public Device createDeviceLicense(License license, Device device) {
         // Привязываем лицензию к устройству
         device.setLicense(license);
-        deviceRepository.save(device);
+        // Сохраняем устройство и возвращаем его
+        return deviceRepository.save(device);
     }
 }

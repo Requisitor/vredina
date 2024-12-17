@@ -1,10 +1,14 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.demo.Device;
+import com.example.demo.demo.License;
+import com.example.demo.repository.DeviceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.demo.repository.DeviceLicenseRepository;
 import com.example.demo.demo.DeviceLicense;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -22,7 +26,11 @@ public class DeviceLicenseServiceImpl {
                 .orElseThrow(() -> new RuntimeException("DeviceLicense not found with id: " + id));
     }
 
-    public DeviceLicense createDeviceLicense(DeviceLicense deviceLicense) {
+    public DeviceLicense createDeviceLicense(License license, Device device) {
+        DeviceLicense deviceLicense = new DeviceLicense();
+        deviceLicense.setLicense(license);
+        deviceLicense.setDevice(device);
+        deviceLicense.setActivationDate(new Date());
         return deviceLicenseRepository.save(deviceLicense);
     }
 

@@ -36,6 +36,11 @@ public class LicenseServiceImpl {
         this.licenseHistoryRepository = licenseHistoryRepository;
     }
 
+    public License findLicenseById(Long id) {
+        Optional<License> optionalLicense = licenseRepository.findById(id);
+        return optionalLicense.orElse(null); // Или бросьте исключение, если это более подходящее поведение
+    }
+
     public Optional<License> findLicenseByCode(String activationCode) {
         return licenseRepository.findByActivationCode(activationCode);
     }
