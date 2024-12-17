@@ -174,6 +174,36 @@ public class LicenseServiceImpl {
         licenseHistoryRepository.save(historyEntry);
     }
 
+    @Transactional
+    public License extendLicense(Long licenseId, int extensionPeriodInDays) {
+        License license = getLicenseById(licenseId);
+        if (license == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "License not found");
+        }
+
+        // Получаем текущего пользователя
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        ApplicationUser currentUser = userRepository.findByEmail(currentUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Продлеваем лицензию
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(license.getEndingDate());
+        cal.add(Calendar.DAY_OF_YEAR, extensionPeriodInDays);
+        license.setEndingDate(cal.getTime());
+
+        // Обновляем duration
+        license.setDuration(license.getDuration() + extensionPeriodInDays);
+
+        // Сохраняем изменения
+        license = licenseRepository.save(license);
+
+        // Записываем изменения в историю
+        recordLicenseChange(license, "Продлена", "Продлена на " + extensionPeriodInDays + " дней", currentUser);
+
+        return license;
+    }
 
 
     private String generateActivationCode() {

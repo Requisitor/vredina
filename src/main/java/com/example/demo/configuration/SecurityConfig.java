@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("licenses").hasRole("ADMIN")
                         .requestMatchers("/api/activation").permitAll()
                         .requestMatchers("/api/licenses/info").hasRole("ADMIN")
+                        .requestMatchers("/api/licenses/renew").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

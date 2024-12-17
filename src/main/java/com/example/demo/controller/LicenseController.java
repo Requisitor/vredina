@@ -1,13 +1,14 @@
 package com.example.demo.controller;
 
-import com.example.demo.demo.ApplicationUser;
 import com.example.demo.demo.License;
 import com.example.demo.demo.LicenseDto;
+import com.example.demo.demo.Ticket;
 import com.example.demo.service.impl.LicenseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ public class LicenseController {
                 licenseDto.getOwnerId(),
                 licenseDto.getLicenseTypeId(),
                 licenseDto.getParameters()
-
         );
         return new ResponseEntity<>(license, HttpStatus.CREATED);
     }
@@ -61,5 +61,15 @@ public class LicenseController {
     public ResponseEntity<Void> deleteLicense(@PathVariable Long id) {
         licenseService.deleteLicense(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{id}/extend")
+    public ResponseEntity<License> extendLicense(@PathVariable Long id, @RequestParam int extensionPeriodInDays) {
+        try {
+            License extendedLicense = licenseService.extendLicense(id, extensionPeriodInDays);
+            return new ResponseEntity<>(extendedLicense, HttpStatus.OK);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(e.getStatusCode());
+        }
     }
 }
