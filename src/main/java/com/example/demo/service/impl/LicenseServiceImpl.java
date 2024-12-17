@@ -34,7 +34,6 @@ public class LicenseServiceImpl {
         this.userRepository = userRepository;
         this.licenseTypeRepository = licenseTypeRepository;
         this.licenseHistoryRepository = licenseHistoryRepository;
-
     }
 
     public Optional<License> findLicenseByCode(String activationCode) {
@@ -82,6 +81,7 @@ public class LicenseServiceImpl {
         ApplicationUser owner = getUserById(ownerId);
         LicenseType licenseType = getLicenseTypeById(licenseTypeId);
 
+        // Получаем текущего пользователя
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         ApplicationUser currentUser = userRepository.findByEmail(currentUsername)
@@ -92,7 +92,9 @@ public class LicenseServiceImpl {
         license.setOwner(owner);
         license.setLicenseType(licenseType);
         license.setParameters(parameters);
+        license.setUser(currentUser); // Устанавливаем пользователя
 
+        // Другие настройки лицензии
         license.setFirstActivationDate(new Date());
         license.setEndingDate(calculateExpirationDate(license));
         license.setBlocked(false);
@@ -110,12 +112,11 @@ public class LicenseServiceImpl {
         license.setActivationCode(generateActivationCode());
         license.setCreationDate(new Date());
         license.setExpirationDate(calculateExpirationDate(license));
-        license.setUser(currentUser);
 
-        // Сохраняем после установки всех полей
+        // Сохраняем лицензию
         license = licenseRepository.save(license);
 
-        recordLicenseChange(license, "Создана", "Описание");
+        recordLicenseChange(license, "Создана", "Created", currentUser);
 
         return license;
     }
@@ -135,7 +136,14 @@ public class LicenseServiceImpl {
         if (license != null) {
             license.setParameters(parameters);
             license = licenseRepository.save(license);
-            recordLicenseChange(license, "Обновлена", "Описание");
+
+            // Fetch the current user here
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentUsername = authentication.getName();
+            ApplicationUser currentUser = userRepository.findByEmail(currentUsername)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+            recordLicenseChange(license, "Обновлена", "Описание", currentUser);
         }
         return license;
     }
@@ -151,12 +159,17 @@ public class LicenseServiceImpl {
         }
     }
 
-    public void recordLicenseChange(License license, String action, String description) {
-        LicenseHistory licenseHistory = new LicenseHistory();
-        licenseHistory.setLicense(license);
-        licenseHistory.setDescription(description);
-        licenseHistoryRepository.save(licenseHistory);
+    public void recordLicenseChange(License license, String status, String description, ApplicationUser user) {
+        LicenseHistory historyEntry = new LicenseHistory();
+        historyEntry.setLicense(license);
+        historyEntry.setStatus(status);
+        historyEntry.setDescription(description);
+        historyEntry.setChangeDate(LocalDateTime.now());
+        historyEntry.setUser(user);
+        licenseHistoryRepository.save(historyEntry);
     }
+
+
 
     private String generateActivationCode() {
         return UUID.randomUUID().toString();
@@ -178,14 +191,12 @@ public class LicenseServiceImpl {
         }
     }
 
-
     private ApplicationUser getUserById(Long userId) {
         Optional<ApplicationUser> user = userRepository.findById(userId);
         return user.orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Пользователь с ID " + userId + " не найден"
         ));
-
     }
 
     private LicenseType getLicenseTypeById(Long licenseTypeId) {

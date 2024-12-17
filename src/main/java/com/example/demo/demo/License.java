@@ -37,7 +37,7 @@ public class License {
     private LicenseType licenseType;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", nullable = false)
     private ApplicationUser owner;
 
     private Date firstActivationDate;

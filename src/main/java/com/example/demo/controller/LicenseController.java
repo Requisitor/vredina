@@ -31,7 +31,8 @@ public class LicenseController {
                 licenseDto.getProductId(),
                 licenseDto.getOwnerId(),
                 licenseDto.getLicenseTypeId(),
-                licenseDto.getParameters()// Pass the user ID instead of the user object
+                licenseDto.getParameters()
+
         );
         return new ResponseEntity<>(license, HttpStatus.CREATED);
     }
