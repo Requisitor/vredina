@@ -56,12 +56,13 @@ public class LicenseHistoryServiceImpl {
     }
 
     @Transactional
-    public void recordLicenseChange(License license, String status, String description) {
+    public void recordLicenseChange(License license, String status, String description, ApplicationUser user) {
         LicenseHistory historyEntry = new LicenseHistory();
         historyEntry.setLicense(license);
         historyEntry.setStatus(status);
         historyEntry.setDescription(description);
         historyEntry.setChangeDate(LocalDateTime.now());
+        historyEntry.setUser(user);
         save(historyEntry);
     }
 }

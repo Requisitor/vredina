@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.demo.ApplicationUser;
 import com.example.demo.demo.License;
 import com.example.demo.demo.LicenseDto;
 import com.example.demo.service.impl.LicenseServiceImpl;
@@ -25,12 +26,12 @@ public class LicenseController {
     }
 
     @PostMapping
-    public ResponseEntity<License> createLicense(@RequestBody LicenseDto licenseDto) { // <- Добавлена аннотация @RequestBody
+    public ResponseEntity<License> createLicense(@RequestBody LicenseDto licenseDto) {
         License license = licenseService.createLicense(
                 licenseDto.getProductId(),
                 licenseDto.getOwnerId(),
                 licenseDto.getLicenseTypeId(),
-                licenseDto.getParameters()
+                licenseDto.getParameters()// Pass the user ID instead of the user object
         );
         return new ResponseEntity<>(license, HttpStatus.CREATED);
     }

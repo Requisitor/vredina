@@ -54,7 +54,7 @@ public class ActivationController {
                 deviceService.createDeviceLicense(license, device);
                 licenseService.updateLicense(license);
                 // Изменен вызов метода
-                licenseHistoryService.recordLicenseChange(license, "Activated", "success");
+                licenseHistoryService.recordLicenseChange(license, "Activated", "success", user);
 
                 Ticket ticket = licenseService.generateTicket(license, device);
 
