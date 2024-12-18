@@ -7,6 +7,7 @@ import com.example.demo.demo.Demo;
 
 import java.util.List;
 
+//TODO: 1. Этого уже быть не должно
 
 @RestController
 @RequestMapping("/demo")

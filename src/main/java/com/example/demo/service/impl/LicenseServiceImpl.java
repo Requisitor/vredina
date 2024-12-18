@@ -16,6 +16,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
+//TODO: 1. validateActivation - лучше сравнивать не owner с текущим пользователем, а user. Иначе активировать может только тот, кто владеет
+//TODO: 2. Тикет не подписывается
+//TODO: 3. createLicense - лишняя проверка пользователя
+//TODO: 4. Не понятно назначение поля parameters в лицензии
+//TODO: 5. createLicense - полу user устанавливается при первой активации. При создании заполняется только owner
+//TODO: 6. createLicense - даты первой активации и окончания действия ставятся при первой активации
+//TODO: 7. createLicense - устройство ещё устанавливать рано, о нём нет информации
+//TODO: 8. extendLicense - идентификаторы хранятся только у вас. У клиента есть код активации
+//TODO: 9. extendLicense - продлить лицензию может любой пользователь для любого пользователя?
+
 @Service
 public class LicenseServiceImpl {
 

@@ -13,5 +13,6 @@ spring:
     show-sql: true
 
 jwt:
+  # Секреты не должны храниться в открытом виде
   secret: zavyalovegorsergeevich1BIB220660
   expiration: 36000000

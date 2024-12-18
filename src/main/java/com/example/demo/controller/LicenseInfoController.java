@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+//TODO: 1. Никто кроме вашего сервиса не знает Id из ваших таблиц. Оперировать ими плохая идея
+//TODO: 2. "Допустим, берем первую найденную лицензию" - плохой подход, либо берём конкретную, либо все
+//TODO: 3. Тикет возвращается без подписи
+
 @RestController
 @RequestMapping("/api/licenses")
 public class LicenseInfoController {

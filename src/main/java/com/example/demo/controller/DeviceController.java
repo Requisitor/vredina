@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//TODO: 1. В методе createDevice нельзя сохранять или обновлять пользователя. Это нарушает логику метода
+//TODO: 2. updateDevice - нельзя вручную модифицировать первичные ключи, это приведёт к ошибкам
+
 @RestController
 @RequestMapping("/api/devices") // Добавляем @RequestMapping на уровне класса
 public class DeviceController {

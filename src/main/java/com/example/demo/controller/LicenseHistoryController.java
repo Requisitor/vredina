@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+//TODO: 1. Вносить изменения в записи аудита извне нельзя, можно только читать
+
 @RestController
 @RequestMapping("/api/license-histories")
 public class LicenseHistoryController {
