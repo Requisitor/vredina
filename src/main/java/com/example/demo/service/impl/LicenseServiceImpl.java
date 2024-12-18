@@ -3,12 +3,14 @@ package com.example.demo.service.impl;
 import com.example.demo.demo.*;
 import com.example.demo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -23,6 +25,7 @@ public class LicenseServiceImpl {
     private final LicenseTypeRepository licenseTypeRepository;
     private final LicenseHistoryRepository licenseHistoryRepository;
 
+
     @Autowired
     public LicenseServiceImpl(LicenseRepository licenseRepository,
                               ProductRepository productRepository,
@@ -34,6 +37,8 @@ public class LicenseServiceImpl {
         this.userRepository = userRepository;
         this.licenseTypeRepository = licenseTypeRepository;
         this.licenseHistoryRepository = licenseHistoryRepository;
+
+
     }
 
     public License findLicenseById(Long id) {
@@ -68,7 +73,10 @@ public class LicenseServiceImpl {
         LocalDateTime firstActivationDate = LocalDateTime.now(ZoneId.of("UTC"));
         LocalDateTime endingDate = firstActivationDate.plusDays(license.getLicenseType().getDuration());
 
-        Ticket ticket = new Ticket(license.getLicenseType().getDuration() * 24 * 60 * 60,
+        // Устанавливаем время жизни тикета в 30 минут (30 * 60 секунд)
+        long ticketLifetime = 30 * 60;
+
+        Ticket ticket = new Ticket(ticketLifetime, // Передаем время жизни тикета
                 firstActivationDate,
                 endingDate,
                 license.getOwner().getId(),
