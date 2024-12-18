@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//TODO: 1. Разграничить права доступа
+
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {

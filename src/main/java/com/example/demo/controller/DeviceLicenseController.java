@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+//TODO: 1. Это служебная таблица. Её нельзя модифицировать извне
+
 @RestController
 @RequestMapping("/api/device-licenses")
 public class DeviceLicenseController {

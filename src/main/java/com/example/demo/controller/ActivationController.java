@@ -21,6 +21,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+//TODO: 1. Map<String, String> - заменить на объект (DTO)
+//TODO: 2. А если при активации устройство уже есть в базе?
+//TODO: 3. При активации нет разграничения случаев первой и повторной активации
+//TODO: 4. Даты первой активации и окончания должны считаться при первой активации
+
 @RestController
 @RequestMapping("/api/activation")
 public class ActivationController {

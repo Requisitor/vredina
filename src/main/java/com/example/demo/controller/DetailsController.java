@@ -7,6 +7,8 @@ import com.example.demo.demo.Details;
 import com.example.demo.repository.DetailsRepository;
 import com.example.demo.service.DemoService;
 
+//TODO: 1. Этого уже быть не должно
+
 @RestController
 @RequestMapping("/details")
 @RequiredArgsConstructor

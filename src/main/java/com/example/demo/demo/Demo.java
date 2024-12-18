@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.util.List;
 
+//TODO: 1. Demo и прочего здесь быть не должно. Это был пример
+
 @Entity
 @Table(name = "demo")
 @NoArgsConstructor

@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Map;
 
+//TODO: 1. Создать лицензию может кто угодно? Пересмотреть права доступа к методам
+
 @RestController
 @RequestMapping("/licenses")
 public class LicenseController {
