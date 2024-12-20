@@ -15,3 +15,6 @@ spring:
 jwt:
   secret: ${TOKEN}
   expiration: 36000000
+
+digital-signature:
+  secret-key: "your-secret-key-here"

@@ -6,6 +6,7 @@ import com.example.demo.service.impl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,9 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -35,6 +41,7 @@ public class ActivationController {
     private final UserRepository userRepository;
     private final DeviceLicenseServiceImpl deviceLicenseService;
     private final AuthenticationServiceImpl authenticationService;
+
 
     @Autowired
     public ActivationController(LicenseServiceImpl licenseService,
@@ -145,4 +152,5 @@ public class ActivationController {
         }
         return user;
     }
+
 }

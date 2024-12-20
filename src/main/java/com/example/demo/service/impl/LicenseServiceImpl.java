@@ -5,6 +5,7 @@ import com.example.demo.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -27,6 +32,9 @@ public class LicenseServiceImpl {
     private final LicenseTypeRepository licenseTypeRepository;
     private final LicenseHistoryRepository licenseHistoryRepository;
     private final AuthenticationServiceImpl authenticationService;
+
+    @Value("${digital-signature.secret-key}")
+    private String secretKey;
 
 
     @Autowired
@@ -101,11 +109,24 @@ public class LicenseServiceImpl {
         // Устанавливаем время жизни тикета в 30 минут (30 * 60 секунд)
         long ticketLifetime = 30 * 60;
 
+        // Создаем данные для подписи
+        String dataToSign = license.getId() + ":" + device.getId() + ":" + firstActivationDate + ":" + endingDate;
+
+        // Генерируем цифровую подпись
+        String digitalSignature = null;
+        try {
+            digitalSignature = generateDigitalSignature(dataToSign);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            logger.error("Error generating digital signature: ", e);
+            throw new RuntimeException("Error generating digital signature", e);
+        }
+
         Ticket ticket = new Ticket(ticketLifetime, // Передаем время жизни тикета
                 firstActivationDate,
                 endingDate,
                 license.getOwner().getId(),
-                device.getId());
+                device.getId(),
+                digitalSignature);
         logger.info("Ticket generated: {}", ticket);
         return ticket;
     }
@@ -316,5 +337,20 @@ public class LicenseServiceImpl {
             logger.warn("License type with ID {} not found.", licenseTypeId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "License type not found");
         }
+    }
+
+    public String generateDigitalSignature(String data) throws NoSuchAlgorithmException, InvalidKeyException {
+        // Create a Mac instance for the HMAC-SHA256 algorithm
+        Mac mac = Mac.getInstance("HmacSHA256");
+
+        // Initialize the Mac instance with the secret key
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+        mac.init(secretKeySpec);
+
+        // Generate the digital signature
+        byte[] digitalSignature = mac.doFinal(data.getBytes());
+
+        // Encode the digital signature to a base64 string
+        return Base64.getEncoder().encodeToString(digitalSignature);
     }
 }
