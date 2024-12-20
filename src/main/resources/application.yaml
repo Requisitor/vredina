@@ -13,5 +13,5 @@ spring:
     show-sql: true
 
 jwt:
-  secret: zavyalovegorsergeevich1BIB220660
+  secret: ${TOKEN}
   expiration: 36000000

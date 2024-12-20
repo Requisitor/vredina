@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,8 @@ public class License {
     private Integer deviceCount;
     private Long duration;
     private String description;
+
+
     // <-- Добавлено
     @Setter
     private String activationCode;
@@ -77,7 +80,6 @@ public class License {
 
     public void setDevice(boolean b) {
     }
-
 
     public String generateCode() {
         this.code = UUID.randomUUID().toString();

@@ -45,4 +45,9 @@ public class DeviceLicenseServiceImpl {
     public void deleteDeviceLicense(Long id) {
         deviceLicenseRepository.deleteById(id);
     }
+
+    public boolean isLicenseActivatedOnDevice(License license, Device device) {
+        // Предполагая, что у вас есть DeviceLicenseRepository и сущность DeviceLicense
+        return deviceLicenseRepository.existsByLicenseAndDevice(license, device);
+    }
 }

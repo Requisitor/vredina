@@ -18,24 +18,21 @@ public class DeviceServiceImpl {
         this.deviceRepository = deviceRepository;
     }
 
-    public Device findDeviceById(Long id) {
-        Optional<Device> optionalDevice = deviceRepository.findById(id);
-        return optionalDevice.orElse(null); // Или бросьте исключение
+    public Optional<Device> findDeviceById(Long id) {
+        return deviceRepository.findById(id);
     }
 
     @Transactional
     public Device saveDevice(Device device) {
-        // Валидация данных (например, проверка на null или пустые значения)
+        // Валидация данных
         if (device == null || device.getName() == null || device.getName().isEmpty() || device.getMacAddress() == null || device.getMacAddress().isEmpty()) {
             throw new IllegalArgumentException("Некорректные данные устройства.");
         }
         return deviceRepository.save(device);
     }
 
-    public Device getDeviceById(Long id) {
-        // Обработка случая, когда устройство не найдено
-        Optional<Device> optionalDevice = deviceRepository.findById(id);
-        return optionalDevice.orElse(null); // Возвращает null, если устройство не найдено
+    public Optional<Device> getDeviceById(Long id) {
+        return deviceRepository.findById(id);
     }
 
     public List<Device> getAllDevices() {
@@ -53,12 +50,12 @@ public class DeviceServiceImpl {
 
     @Transactional
     public Device updateDevice(Device device) {
-        // Валидация данных (аналогично saveDevice)
+        // Валидация данных
         if (device == null || device.getId() == null || device.getName() == null || device.getName().isEmpty() || device.getMacAddress() == null || device.getMacAddress().isEmpty()) {
             throw new IllegalArgumentException("Некорректные данные устройства.");
         }
 
-        // Проверка на существование устройства перед обновлением
+        // Проверка на существование устройства перед обновлением  (можно убрать, если  save  сделает merge)
         if (!deviceRepository.existsById(device.getId())) {
             throw new IllegalArgumentException("Устройство с ID " + device.getId() + " не найдено.");
         }
@@ -67,9 +64,11 @@ public class DeviceServiceImpl {
 
     @Transactional
     public Device createDeviceLicense(License license, Device device) {
-        // Привязываем лицензию к устройству
         device.setLicense(license);
-        // Сохраняем устройство и возвращаем его
         return deviceRepository.save(device);
+    }
+
+    public Optional<Device> findByMacAddress(String macAddress) {
+        return deviceRepository.findByMacAddress(macAddress);
     }
 }

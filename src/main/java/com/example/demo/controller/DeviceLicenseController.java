@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+//TODO: 1. Это служебная таблица. Её нельзя модифицировать извне
 
 @RestController
 @RequestMapping("/api/device-licenses")
@@ -30,7 +33,8 @@ public class DeviceLicenseController {
     private License extractLicenseFromRequest(Map<String, Object> request) {
         try {
             Long licenseId = Long.parseLong(request.get("licenseId").toString());
-            return licenseService.findLicenseById(licenseId); // Используйте внедренный licenseService
+            Optional<License> optionalLicense = Optional.ofNullable(licenseService.findLicenseById(licenseId));
+            return optionalLicense.orElse(null); // Возвращаем null, если лицензия не найдена
         } catch (NullPointerException | NumberFormatException e) {
             return null;
         }
@@ -39,12 +43,12 @@ public class DeviceLicenseController {
     private Device extractDeviceFromRequest(Map<String, Object> request) {
         try {
             Long deviceId = Long.parseLong(request.get("deviceId").toString());
-            return deviceService.findDeviceById(deviceId); // Используйте внедренный deviceService
+            Optional<Device> optionalDevice = deviceService.findDeviceById(deviceId);
+            return optionalDevice.orElse(null); // Возвращаем null, если устройство не найдено
         } catch (NullPointerException | NumberFormatException e) {
             return null;
         }
     }
-
 
     @GetMapping
     public List<DeviceLicense> getAllDeviceLicenses() {
@@ -57,32 +61,24 @@ public class DeviceLicenseController {
         return ResponseEntity.ok(deviceLicense);
     }
 
+    //Создание новых записей запрещено.
     @PostMapping
-    public ResponseEntity<DeviceLicense> createDeviceLicense(@RequestBody Map<String, Object> request) {
-        License license = extractLicenseFromRequest(request);
-        Device device = extractDeviceFromRequest(request);
-
-        // Проверка на null важна!
-        if (license == null || device == null) {
-            return ResponseEntity.badRequest().body(null); // Или более информативное сообщение об ошибке
-        }
-
-
-        DeviceLicense createdDeviceLicense = deviceLicenseService.createDeviceLicense(license, device);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdDeviceLicense);
+    public ResponseEntity<String> createDeviceLicense(@RequestBody Map<String, Object> request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Modification of this table is not allowed.");
     }
 
-
-
+    // Обновление существующих записей запрещено.
     @PutMapping("/{id}")
-    public ResponseEntity<DeviceLicense> updateDeviceLicense(@PathVariable Long id, @RequestBody DeviceLicense deviceLicense) {
-        DeviceLicense updatedDeviceLicense = deviceLicenseService.updateDeviceLicense(id, deviceLicense);
-        return ResponseEntity.ok(updatedDeviceLicense);
+    public ResponseEntity<String> updateDeviceLicense(@PathVariable Long id, @RequestBody DeviceLicense deviceLicense) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Modification of this table is not allowed.");
     }
 
+    //Удаление записей запрещено.
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDeviceLicense(@PathVariable Long id) {
-        deviceLicenseService.deleteDeviceLicense(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteDeviceLicense(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Modification of this table is not allowed.");
     }
 }

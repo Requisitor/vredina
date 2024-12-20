@@ -27,5 +27,6 @@ public class AuthenticationServiceImpl {
         String currentUsername = authentication.getName();
         return userRepository.findByEmail(currentUsername)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
     }
 }

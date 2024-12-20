@@ -15,6 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.example.demo.demo.ApplicationRole.ADMIN;
+
+
+//TODO: 1. Пересмотреть права доступа для пользователей
+
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -36,12 +41,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/registration").permitAll()
                         .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/licenses-types").permitAll()
-                        .requestMatchers("licenses").hasRole("ADMIN")
                         .requestMatchers("/api/activation").permitAll()
                         .requestMatchers("/api/licenses/info").hasRole("ADMIN")
-                        .requestMatchers("/api/licenses/renew").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

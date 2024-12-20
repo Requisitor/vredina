@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+//TODO: 1. Вносить изменения в записи аудита извне нельзя, можно только читать
+
 @RestController
 @RequestMapping("/api/license-histories")
 public class LicenseHistoryController {
@@ -27,12 +29,6 @@ public class LicenseHistoryController {
         this.licenseService = licenseService;
     }
 
-    @PostMapping
-    public ResponseEntity<LicenseHistory> createLicenseHistory(@RequestBody LicenseHistory licenseHistory) {
-        LicenseHistory createdHistory = licenseHistoryService.save(licenseHistory);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdHistory);
-    }
-
     @GetMapping
     public List<LicenseHistory> getAllLicenseHistories() {
         return licenseHistoryService.getAll();
@@ -43,18 +39,6 @@ public class LicenseHistoryController {
         return licenseHistoryService.getById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLicenseHistory(@PathVariable Long id) {
-        try {
-            LicenseHistory licenseHistoryToDelete = new LicenseHistory();
-            licenseHistoryToDelete.setId(id);
-            licenseHistoryService.delete(licenseHistoryToDelete);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
     }
 
     @GetMapping("/license/{licenseId}")
