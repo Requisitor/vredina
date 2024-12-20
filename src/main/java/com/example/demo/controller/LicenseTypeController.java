@@ -56,15 +56,16 @@ public class LicenseTypeController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // Только ADMIN может удалять
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLicenseType(@PathVariable Long id) {
         try {
-            licenseTypeService.delete(id);
+            licenseTypeService.delete(id); // Теперь каскадное удаление
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
     }
+
 
     @GetMapping("/name/{name}")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')") // ADMIN и USER могут искать по имени

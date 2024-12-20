@@ -20,4 +20,6 @@ public interface LicenseRepository extends JpaRepository<License, Long> {
 
     Optional<License> findByActivationCode(String activationCode);
 
+    List<License> findByProductId(Long productId);
+
 }

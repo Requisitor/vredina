@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.demo.Product;
+import com.example.demo.service.impl.LicenseServiceImpl;
 import com.example.demo.service.impl.ProductServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,11 @@ import java.util.List;
 public class ProductController {
 
     private final ProductServiceImpl productService;
+    private final LicenseServiceImpl licenseService;
 
-    public ProductController(ProductServiceImpl productService) {
+    public ProductController(ProductServiceImpl productService, LicenseServiceImpl licenseService) {
         this.productService = productService;
+        this.licenseService = licenseService;
     }
 
     @GetMapping
@@ -52,14 +55,24 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // Доступ только для роли ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         if (!productService.findById(id).isPresent()) {
             return ResponseEntity.notFound().build();
         }
+
+        // Находим лицензии, связанные с продуктом
+        List<com.example.demo.demo.License> licenses = licenseService.findLicensesByProduct(id);
+
+        // Удаляем связанные лицензии
+        for (com.example.demo.demo.License license : licenses) {
+            licenseService.deleteLicense(license.getId());
+        }
+
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('USER')") // Доступ для роли USER

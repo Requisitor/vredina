@@ -218,18 +218,23 @@ public class LicenseServiceImpl {
         return license;
     }
 
+    public List<License> findLicensesByProduct(Long productId) {
+        return licenseRepository.findByProductId(productId);
+    }
+
     @Transactional
-    public void deleteLicense(Long id) {
-        logger.info("Deleting license with ID: {}", id);
-        License license = getLicenseById(id);
-        if (license != null) {
-            // Сначала удаляем связанные записи LicenseHistory
-            licenseHistoryRepository.deleteAllByLicense(license);
-            // Теперь можно безопасно удалить саму лицензию
+    public void deleteLicense(Long licenseId) {
+        logger.info("Удаление лицензии с ID: {}", licenseId);
+
+        Optional<License> optionalLicense = licenseRepository.findById(licenseId);
+        if (optionalLicense.isPresent()) {
+            License license = optionalLicense.get();
+
             licenseRepository.delete(license);
-            logger.info("License with ID {} deleted successfully.", id);
+            logger.info("Лицензия {} успешно удалена.", licenseId);
         } else {
-            logger.warn("License with ID {} not found for deletion.", id);
+            logger.warn("Лицензия с ID {} не найдена.", licenseId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Лицензия не найдена");
         }
     }
 
@@ -258,11 +263,11 @@ public class LicenseServiceImpl {
         ApplicationUser currentUser = authenticationService.getCurrentUser();
 
         // Проверяем, имеет ли текущий пользователь право продлевать лицензию для кого угодно
-            // Проверяем, является ли текущий пользователь владельцем лицензии
-            if (!currentUser.getId().equals(license.getUser().getId())) {
-                logger.warn("User with email {} does not have permission to extend license with ID {}", currentUser.getEmail(), licenseId);
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to extend this license");
-            }
+        // Проверяем, является ли текущий пользователь владельцем лицензии
+        if (!currentUser.getId().equals(license.getUser().getId())) {
+            logger.warn("User with email {} does not have permission to extend license with ID {}", currentUser.getEmail(), licenseId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to extend this license");
+        }
 
 
         // Продлеваем лицензию
@@ -353,4 +358,6 @@ public class LicenseServiceImpl {
         // Encode the digital signature to a base64 string
         return Base64.getEncoder().encodeToString(digitalSignature);
     }
+
+
 }

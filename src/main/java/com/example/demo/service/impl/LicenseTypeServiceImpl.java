@@ -1,10 +1,14 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.demo.License;
 import com.example.demo.demo.LicenseType;
+import com.example.demo.repository.LicenseRepository;
+import com.example.demo.repository.LicenseTypeRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +20,12 @@ public class LicenseTypeServiceImpl {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Autowired
+    private LicenseTypeRepository licenseTypeRepository;
+
+    @Autowired
+    private LicenseRepository licenseRepository;
 
     @Transactional
     public LicenseType save(LicenseType licenseType) {
@@ -31,14 +41,16 @@ public class LicenseTypeServiceImpl {
 
     @Transactional
     public void delete(Long id) {
-        LicenseType licenseType = entityManager.find(LicenseType.class, id);
+        LicenseType licenseType = licenseTypeRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Тип лицензии не найден"));
 
-        if (licenseType != null) {
-            entityManager.remove(licenseType);
-        } else {
-            throw new IllegalArgumentException("License type with ID " + id + " not found.");
-        }
+        // Перед удалением типа лицензии, удаляем связанные лицензии
+        List<License> licensesToDelete = licenseRepository.findByLicenseType(licenseType);
+        licenseRepository.deleteAll(licensesToDelete);
+
+        licenseTypeRepository.delete(licenseType);
     }
+
 
     public LicenseType findById(Long id) {
         return entityManager.find(LicenseType.class, id);

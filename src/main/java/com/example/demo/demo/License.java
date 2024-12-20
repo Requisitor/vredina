@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,9 +35,11 @@ public class License {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "type_id")
+    @ManyToOne(fetch = FetchType.EAGER, optional = false) // optional = false обязательно
+    @JoinColumn(name = "type_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Добавлено каскадное удаление
     private LicenseType licenseType;
+
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
@@ -53,10 +57,10 @@ public class License {
     @Setter
     private String activationCode;
 
-    @OneToMany(mappedBy = "license")
+    @OneToMany(mappedBy = "license", cascade = CascadeType.REMOVE)
     private List<DeviceLicense> deviceLicenses;
 
-    @OneToMany(mappedBy = "license")
+    @OneToMany(mappedBy = "license", cascade = CascadeType.REMOVE)
     private List<LicenseHistory> licenseHistory;
 
 
